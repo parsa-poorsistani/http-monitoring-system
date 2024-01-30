@@ -4,6 +4,6 @@ metadata:
   name: http-monitor-config
 data:
   SERVER_PORT: "8080"
-  DATABASE_HOST: "postgres"
+  DATABASE_HOST: "my-postgres-postgresql-primary"
   DATABASE_PORT: "5432"
   DATABASE_NAME: "cloudproj"
