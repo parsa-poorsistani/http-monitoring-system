@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-monitor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: http-monitor
+  template:
+    metadata:
+      labels:
+        app: http-monitor
+    spec:
+      containers:
+      - name: http-monitor
+        image: parsa1378/http_monitoring_app:v2
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: SERVER_PORT
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: DATABASE_PORT
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: DATABASE_NAME
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: DATABASE_HOST
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: password
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+      volumes:
+      - name: config
+        configMap:
+          name: http-monitor-config

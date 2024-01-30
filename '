@@ -31,23 +31,23 @@ func main() {
   log.Info("App starting ...")
   fmt.Print("APP Starting ...")
 
-  cfg := config.LoadConfig() 
-  //if err != nil {
-    //fmt.Printf("config load fucked ...:%v \n", err)
-    //log.WithError(err).Fatal("Failed to load config file")
-  //}
+  cfg, err := config.LoadConfig("/root/")
+  if err != nil {
+    fmt.Printf("config load fucked ...:%v \n", err)
+    log.WithError(err).Fatal("Failed to load config file")
+  }
 
- // dbUser, err := os.ReadFile("/etc/secret-volume/username")
-  //if err != nil {
-    //  log.Fatal("Failed to read database user secret", err)
-  //}
-  //dbPassword, err := os.ReadFile("/etc/secret-volume/password")
-  //if err != nil {
-    //  log.Fatal("Failed to read database password secret", err)
-  //}
+  dbUser, err := os.ReadFile("/etc/secret-volume/username")
+  if err != nil {
+      log.Fatal("Failed to read database user secret", err)
+  }
+  dbPassword, err := os.ReadFile("/etc/secret-volume/password")
+  if err != nil {
+      log.Fatal("Failed to read database password secret", err)
+  }
 
-  //cfg.Database.User = string(dbUser)
-  //cfg.Database.Password = string(dbPassword)
+  cfg.Database.User = string(dbUser)
+  cfg.Database.Password = string(dbPassword)
 
   db, err := database.NewDatabase(cfg)
   if err != nil {

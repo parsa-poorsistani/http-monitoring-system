@@ -1,0 +1,38 @@
+replicaCount: 2
+
+image:
+  repository: parsa1378/http_monitor_app 
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+  requests:
+    cpu: "250m"
+    memory: "128Mi"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+
+config:
+  SERVER_PORT: "8080"
+  DATABASE_HOST: "postgres-db"
+  DATABASE_PORT: "5432"
+
+secrets:
+  DATABASE_USER: "test"
+  DATABASE_PASSWORD: "test"
+  DATABASE_NAME: "cloudproj"
+
+# Custom values for healthcheck
+healthcheck:
+  interval: 5
