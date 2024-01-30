@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile
 
     volumes:
-      - app_log:/Users/parsapoorsistani/Code/http-monitoring-system:/root
       - type: bind
         source: ./config.yaml
         target: /root/config.yaml
@@ -43,10 +42,9 @@ networks:
     driver: bridge
 
 volumes:
-  app_log:
   db_data:
     driver: local
     driver_opts:
       type: none
-      device: /Users/parsapoorsistani/Desktop/p
+      device: ./data
       o: bind
