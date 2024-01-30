@@ -1,0 +1,12 @@
+server:
+  port: "8080"
+
+database:
+  port: "5432"
+  host: "db"
+  user: "test"
+  password: "test"
+  name: "cloudproj"
+
+healthcheck:
+  interval: 5
