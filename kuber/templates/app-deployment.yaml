@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: http-monitor
-        image: parsa1378/http_monitoring_app:v2.4.1
+        image: parsa1378/http_monitoring_app:v2.4.2
         ports:
         - containerPort: 8080
         env:
