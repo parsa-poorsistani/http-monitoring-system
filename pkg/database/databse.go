@@ -25,7 +25,7 @@ type Database struct {
 func NewDatabase(cfg *config.Config) (*Database, error) {
 
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-    cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Password ,cfg.Database.Name)
+    cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Password, cfg.Database.Name)
   db, err := sql.Open("postgres", connStr)
 
   if err != nil {
@@ -39,6 +39,22 @@ func NewDatabase(cfg *config.Config) (*Database, error) {
   }
 
   return &Database{conn: db}, nil
+}
+
+func (db *Database) InitDb(){
+   query := `CREATE TABLE IF NOT EXISTS servers (
+    id SERIAL PRIMARY KEY,
+    address VARCHAR(255),
+    success BIGINT,
+    failure BIGINT,
+    last_failure TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE
+);
+`
+  _ , err := db.conn.Exec(query)
+  if err != nil {
+    fmt.Printf("cannot create database table: %v\n", err.Error())
+  }
 }
 
 func (db *Database) Close() {

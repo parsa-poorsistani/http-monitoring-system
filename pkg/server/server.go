@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+  "fmt"
 
   "github.com/sirupsen/logrus"
 	"github.com/parsa-poorsistani/http-monitoring-system/pkg/config"
@@ -26,7 +27,9 @@ func NewServer(db *database.Database, cfg *config.Config, logger *logrus.Logger)
 
 func (s *Server) Router() http.Handler {
 	mux := http.NewServeMux()
-
+  
+  fmt.Print("kir to server")
+  mux.HandleFunc("/", s.handleRoot)
 	mux.HandleFunc("/api/server", s.handleServer)
 	mux.HandleFunc("/api/server/all", s.handleAllServers)
 
@@ -34,6 +37,7 @@ func (s *Server) Router() http.Handler {
 }
 
 func (s *Server) handleServer(w http.ResponseWriter, r *http.Request) {
+  fmt.Print("kir 2 server")
 	switch r.Method {
 	case http.MethodPost:
 		s.createServerModel(w, r)
@@ -43,6 +47,16 @@ func (s *Server) handleServer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
 }
+
+func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
+    if r.URL.Path != "/" {
+        http.NotFound(w, r)
+        return
+    }
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprint(w, "Welcome to the HTTP Monitoring System")
+}
+
 
 func (s *Server) handleAllServers(w http.ResponseWriter, r *http.Request) {
 
@@ -58,6 +72,8 @@ func (s *Server) handleAllServers(w http.ResponseWriter, r *http.Request) {
 
   servers, err := s.db.GetAllServers()
   if err != nil {
+    fmt.Printf("%v :", err.Error())
+    s.log.WithError(err).Fatal("Error with Query ... \n")
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
   }

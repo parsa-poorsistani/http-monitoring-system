@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: http-monitor
-        image: parsa1378/http_monitoring_app:v2
+        image: parsa1378/http_monitoring_app:v2.3
         ports:
         - containerPort: 8080
         env:
@@ -55,6 +55,25 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 10
       volumes:
       - name: config
         configMap:

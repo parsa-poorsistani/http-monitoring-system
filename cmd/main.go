@@ -54,7 +54,7 @@ func main() {
     fmt.Printf("DB FUCKED ...: %v \n", err)
     log.WithError(err).Fatal("Failed to set up the DB")
   }
-
+  db.InitDb()
   srv := server.NewServer(db,cfg,log)
 
   httpAddr := ":" + cfg.Server.Port
