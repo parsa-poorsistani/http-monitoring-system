@@ -1,0 +1,53 @@
+app:
+  services:
+    port: 80
+    targetPort: 8080
+    type: ClusterIP
+  deployment:
+    image:
+      repository: parsa1378/http_monitoring_app
+      tag: v2.3
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
+
+    replicas: 2
+  hpa:
+    ports:
+      port: 80
+      targetPort: 8080
+      type: ClusterIP
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 50
+db:
+  services:
+    ports:
+      port: 5432
+      targetPort: 5432
+
+  deployment:
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
+    image:
+      repository: postgres
+      tag: 13
+gload:
+  image:
+    repository: parsa1378/goload
+    tag: v1.1
+  container:
+    port: 8081
+
+
+

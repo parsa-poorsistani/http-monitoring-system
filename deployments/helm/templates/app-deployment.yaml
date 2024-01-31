@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-monitor
+spec:
+  replicas: { { .Values.app.deployment.replicas } }
+  selector:
+    matchLabels:
+      app: http-monitor
+  template:
+    metadata:
+      labels:
+        app: http-monitor
+    spec:
+      containers:
+      - name: http-monitor
+        image: {{ .Values.app.deployment.image.repository }}:{{ .Values.app.deployment.image.tag }}
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: SERVER_PORT
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: DATABASE_PORT
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: DATABASE_NAME
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: http-monitor-config
+              key: DATABASE_HOST
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: password
+        resources:
+          requests:
+            memory: {{ .Values.app.deployment.resources.requests.memory }}
+            cpu: {{ .Values.app.deployment.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.app.deployment.resources.limits.memory }}
+            cpu: {{ .Values.app.deployment.resources.limits.cpu }}
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 10
+      volumes:
+      - name: config
+        configMap:
+          name: http-monitor-config
