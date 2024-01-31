@@ -6,6 +6,9 @@ import (
 	"strconv"
   "fmt"
 
+  "github.com/prometheus/client_golang/prometheus"
+  "github.com/parsa-poorsistani/http-monitoring-system/pkg/metric"
+  "github.com/prometheus/client_golang/prometheus/promhttp"
   "github.com/sirupsen/logrus"
 	"github.com/parsa-poorsistani/http-monitoring-system/pkg/config"
 	"github.com/parsa-poorsistani/http-monitoring-system/pkg/database"
@@ -28,7 +31,7 @@ func NewServer(db *database.Database, cfg *config.Config, logger *logrus.Logger)
 func (s *Server) Router() http.Handler {
 	mux := http.NewServeMux()
   
-  fmt.Print("kir to server")
+  mux.Handle("/metrics", promhttp.Handler())
   mux.HandleFunc("/", s.handleRoot)
 	mux.HandleFunc("/api/server", s.handleServer)
 	mux.HandleFunc("/api/server/all", s.handleAllServers)
@@ -60,6 +63,10 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleAllServers(w http.ResponseWriter, r *http.Request) {
 
+  path := "/api/server/all"
+  timer := prometheus.NewTimer(metric.HttpRequestDuration.WithLabelValues(path))
+  defer timer.ObserveDuration()
+
   s.log.WithFields(logrus.Fields{
         "method": r.Method,
         "endpoint": "/api/server/all",
@@ -75,9 +82,11 @@ func (s *Server) handleAllServers(w http.ResponseWriter, r *http.Request) {
     fmt.Printf("%v :", err.Error())
     s.log.WithError(err).Fatal("Error with Query ... \n")
     http.Error(w, err.Error(), http.StatusInternalServerError)
+    metric.HttpRequestsErrorsTotal.WithLabelValues(path).Inc()
     return
   }
 
+  metric.HttpRequestsTotal.WithLabelValues(path).Inc()
   w.Header().Set("Content-Type", "application/json")
   json.NewEncoder(w).Encode(servers)
 }

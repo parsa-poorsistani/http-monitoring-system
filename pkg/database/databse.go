@@ -7,6 +7,8 @@ import (
 
   _ "github.com/lib/pq"
   "github.com/parsa-poorsistani/http-monitoring-system/pkg/config"
+  "github.com/parsa-poorsistani/http-monitoring-system/pkg/metric"
+  "github.com/prometheus/client_golang/prometheus"
 )
 
 type Server struct {
@@ -86,6 +88,9 @@ func (db *Database) GetServer(id int64) (*Server, error) {
 }
 
 func (db *Database) GetAllServers() ([]Server, error) {
+  timer := prometheus.NewTimer(metric.DatabaseQueryDuration.WithLabelValues("GetAllServers"))
+  defer timer.ObserveDuration()
+
   var s []Server
   query := `SELECT id, address, success, failure, last_failure, created_at FROM servers;`
 

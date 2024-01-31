@@ -3,10 +3,13 @@ package healthcheck
 
 import (
 
+  "fmt"
   "net/http"
   "time"
   "github.com/parsa-poorsistani/http-monitoring-system/pkg/config"
+  "github.com/parsa-poorsistani/http-monitoring-system/pkg/metric"
   "github.com/parsa-poorsistani/http-monitoring-system/pkg/database"
+  "github.com/prometheus/client_golang/prometheus"
   "github.com/sirupsen/logrus"
 )
 type HealthCheck struct {
@@ -47,6 +50,9 @@ func (hc *HealthCheck) checkServers() {
 }
 
 func (hc *HealthCheck) checkServerHealth(server *database.Server) {
+  timer := prometheus.NewTimer(metric.HealthCheckDuration.WithLabelValues(fmt.Sprintf("%d", server.ID)))
+  defer timer.ObserveDuration()
+
   resp, err := http.Get(server.Address)
   success := err == nil && resp.StatusCode >= 200 && resp.StatusCode < 300
 
