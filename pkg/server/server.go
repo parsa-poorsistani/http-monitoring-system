@@ -36,8 +36,23 @@ func (s *Server) Router() http.Handler {
 	mux.HandleFunc("/api/server", s.handleServer)
 	mux.HandleFunc("/api/server/all", s.handleAllServers)
 
+  mux.HandleFunc("/health/live", s.handleLivenessProbe)
+  mux.HandleFunc("/health/ready", s.handleReadinessProbe)
+
 	return mux
 }
+
+func (s *Server) handleLivenessProbe(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprint(w, "OK")
+}
+
+// Readiness probe handler
+func (s *Server) handleReadinessProbe(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprint(w, "OK")
+}
+
 
 func (s *Server) handleServer(w http.ResponseWriter, r *http.Request) {
   fmt.Print("kir 2 server")
