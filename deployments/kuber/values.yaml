@@ -1,5 +1,10 @@
 replicaCount: 2
 
+
+app:
+
+
+
 image:
   repository: parsa1378/http_monitor_app 
   pullPolicy: IfNotPresent

@@ -1,0 +1,12 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+ name: http-monitor-hpa
+spec:
+ scaleTargetRef:
+   apiVersion: apps/v1
+   kind: Deployment
+   name: http-monitor
+ minReplicas: {{ .Values.app.hpa.minReplicas }}
+ maxReplicas: {{ .Values.app.hpa.maxReplicas }}
+ targetCPUUtilizationPercentage: {{ .Values.app.hpa.targetCPUUtilizationPercentage }}

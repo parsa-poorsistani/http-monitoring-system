@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-monitor-service
+spec:
+  selector:
+    app: http-monitor
+  ports:
+    - protocol: TCP
+      port: {{ .Values.app.services.port }}
+      targetPort: { { .Values.app.services.targetPort } }
+  type: {{ .Values.app.services.type }}
